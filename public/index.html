@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Tracker - Sign In to Docker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Docker login page specific page-level positioning */
+    .docker-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      padding: 1.5rem 1rem;
+    }
+
+    .docker-logo-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .docker-logo-section svg {
+      width: 54px;
+      height: 54px;
+    }
+
+    .docker-logo-section span {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 2.25rem;
+      color: #1d63ed;
+      letter-spacing: -0.04em;
+    }
+
+    .docker-login-card {
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 2.5rem 2rem 2rem 2rem;
+      text-align: center;
+    }
+
+    .docker-login-card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+      color: #1f2937;
+    }
+
+    .docker-login-card p.instructions {
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+      padding: 0 0.5rem;
+    }
+
+    /* Google Button design matched to Docker Hub */
+    .google-docker-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      background-color: #ffffff;
+      color: #1f2937;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .google-docker-btn:hover {
+      background-color: #f9fafb;
+    }
+
+    .google-logo-svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Footer card design matched to Docker */
+    .docker-login-footer {
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #1f2937;
+    }
+
+    .docker-login-footer a {
+      color: #1d63ed;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .docker-login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Primary button styled exactly like Google button */
+    .docker-login-card .btn-primary {
+      background-color: #1d63ed;
+      color: #ffffff;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.95rem;
+      width: 100%;
+      margin-top: 1rem;
+      cursor: pointer;
+      box-shadow: none;
+      transition: background-color 0.2s;
+    }
+
+    .docker-login-card .btn-primary:hover {
+      background-color: #2563eb;
+      transform: none;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="docker-layout">
+    
+    <!-- Docker Logo -->
+    <div class="docker-logo-section">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Containers Stack -->
+        <rect x="2" y="2" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <rect x="6.5" y="2" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <rect x="11" y="2" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <rect x="4.25" y="5.2" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <rect x="8.75" y="5.2" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <rect x="13.25" y="5.2" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <rect x="6.5" y="8.4" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <rect x="11" y="8.4" width="3.5" height="2.2" rx="0.5" fill="#1d63ed" />
+        <!-- Whale Body -->
+        <path d="M1 13 C3 12, 7 12, 10 13.5 C13 14.5, 17 14.5, 19 12.5 C20.5 10.5, 21.5 11.5, 21 13.5 C19.5 17, 16 18, 12 18 C7 18, 4 17, 1 13 Z" fill="#1d63ed" />
+        <!-- Whale Tail -->
+        <path d="M20 12.5 C21 11.5, 22 11.5, 22.5 12 C23 12.5, 23 13.5, 21.5 14 C21 14.2, 20.5 14, 20 13.5" fill="#1d63ed" />
+      </svg>
+      <span>GEEK Glory</span>
+    </div>
+
+    <!-- Main Sign In/Up Card -->
+    <div class="docker-login-card">
+      
+      <h2 id="auth-title">Sign in</h2>
+      <p id="auth-subtitle" class="instructions">Using Docker for work? We recommend signing in with your work email address.</p>
+
+      <!-- Alert banners -->
+      <div id="auth-alert-success" class="alert alert-success"></div>
+      <div id="auth-alert-danger" class="alert alert-danger"></div>
+
+      <!-- Credentials Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="docker-field">
+          <input type="email" id="login-email" required placeholder=" ">
+          <label for="login-email">Username or email address*</label>
+        </div>
+        <div class="docker-field">
+          <input type="password" id="login-password" required placeholder=" ">
+          <label for="login-password">Password*</label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="margin-bottom: 0.5rem;">
+          Continue
+        </button>
+      </form>
+
+      <!-- Credentials Sign-Up Form -->
+      <form id="register-form" onsubmit="handleRegister(event)" style="display: none;">
+        <div class="docker-field">
+          <input type="text" id="register-name" required placeholder=" ">
+          <label for="register-name">Full name*</label>
+        </div>
+        <div class="docker-field">
+          <input type="email" id="register-email" required placeholder=" ">
+          <label for="register-email">Email address*</label>
+        </div>
+        <div class="docker-field">
+          <input type="password" id="register-password" required placeholder=" ">
+          <label for="register-password">Password*</label>
+        </div>
+        <div class="docker-field">
+          <select id="register-session" required>
+            <option value="" disabled selected>Select session</option>
+          </select>
+          <label for="register-session">Requested Session*</label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">
+          Create Account
+        </button>
+      </form>
+
+      <!-- Horizontal Divider -->
+      <div class="divider-container">
+        <span>OR</span>
+      </div>
+
+      <!-- Single Google OAuth button -->
+      <button class="google-docker-btn" onclick="triggerGoogleLogin()">
+        <svg class="google-logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+    </div>
+
+    <!-- Toggle Footer Card -->
+    <div class="docker-login-footer" id="auth-footer-text">
+      Don't have an account? <a href="javascript:void(0)" onclick="toggleDockerAuth('register')">Sign Up</a>
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      if (token && role) {
+        if (role === 'admin') window.location.href = 'admin.html';
+        else if (role === 'student') window.location.href = 'student.html';
+      }
+      
+      loadSessionsDropdown();
+      initGoogleAuthSettings();
+    });
+
+    function toggleDockerAuth(mode) {
+      const title = document.getElementById('auth-title');
+      const subtitle = document.getElementById('auth-subtitle');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const footer = document.getElementById('auth-footer-text');
+
+      if (mode === 'register') {
+        title.innerText = 'Create an Account';
+        subtitle.innerText = 'Join a session to start tracking your attendance.';
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        footer.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleDockerAuth(\'login\')">Sign In</a>';
+      } else {
+        title.innerText = 'Sign in';
+        subtitle.innerText = 'Using Docker for work? We recommend signing in with your work email address.';
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        footer.innerHTML = 'Don\'t have an account? <a href="javascript:void(0)" onclick="toggleDockerAuth(\'register\')">Sign Up</a>';
+      }
+    }
+  </script>
+</body>
+</html>

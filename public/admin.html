@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Tracker - Admin Panel</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Inline specific styling overrides to exactly match the screenshot */
+    body {
+      background-color: #f8fafc;
+    }
+
+    header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .admin-badge {
+      background-color: #e2e8f0;
+      color: #475569;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .admin-nav-tabs {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    .admin-nav-tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-family: var(--font-heading);
+      font-weight: 500;
+      color: #64748b;
+      background: none;
+      border: none;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      transition: var(--transition-smooth);
+    }
+
+    .admin-nav-tab:hover {
+      color: #0f172a;
+    }
+
+    .admin-nav-tab.active {
+      background-color: #0d9488; /* Teal */
+      color: #ffffff;
+    }
+
+    .glass-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px; /* Highly rounded corners */
+      padding: 2.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+    }
+
+    .glass-panel h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Table visual structure matched to screenshot */
+    table th {
+      background-color: #f8fafc;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.75rem 1rem;
+    }
+
+    table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+    }
+
+    .btn-signout {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 0.5rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-signout:hover {
+      background-color: #1e293b;
+    }
+
+    /* Modal override matching clean card styles */
+    .modal-content {
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .badge-late {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .badge-auto {
+      background-color: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        Attendance <span class="brand-accent-admin">Tracker</span>
+        <span class="admin-badge">Admin</span>
+      </div>
+      <div class="nav-user">
+        <span style="font-size: 0.85rem; color: #64748b;">Administrator</span>
+        <button class="btn-signout" onclick="handleLogout()">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Global alert banner notifications -->
+    <div id="admin-alert-success" class="alert alert-success"></div>
+    <div id="admin-alert-danger" class="alert alert-danger"></div>
+
+    <!-- Tab bar matching screenshot 2 -->
+    <div class="admin-nav-tabs">
+      <button class="admin-nav-tab active" id="tab-btn-pending" onclick="switchAdminTab('pending')">
+        Pending Approvals
+      </button>
+      <button class="admin-nav-tab" id="tab-btn-logs" onclick="switchAdminTab('logs')">
+        Attendance Records
+      </button>
+      <button class="admin-nav-tab" id="tab-btn-students" onclick="switchAdminTab('students')">
+        Student Registrations
+      </button>
+      <button class="admin-nav-tab" id="tab-btn-sessions" onclick="switchAdminTab('sessions')">
+        Manage Sessions
+      </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: PENDING APPROVALS -->
+    <!-- ========================================== -->
+    <section id="section-pending" class="glass-panel">
+      <h2>Pending Attendance Approvals</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Session</th>
+              <th>Date</th>
+              <th>Check In Time</th>
+              <th>Check Out Time</th>
+              <th>Late Reason</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pending-logs-tbody">
+            <!-- Empty state fallback matching screenshot 2 -->
+            <tr>
+              <td colspan="8">
+                <div class="empty-state">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v2m4 6h4v1.5a1.5 1.5 0 01-3 0V17h-1zm3 0h.01M9 17h.01" />
+                  </svg>
+                  <p>No pending attendance records to approve.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: ATTENDANCE RECORDS -->
+    <!-- ========================================== -->
+    <section id="section-logs" class="glass-panel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2>Attendance Records</h2>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-secondary" onclick="openManualLogModal()">
+            + Manual Record
+          </button>
+          <button class="btn btn-primary" onclick="exportAttendanceToExcel()">
+            Download Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="form-group" style="flex-direction: row; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <div style="flex: 1; min-width: 180px;">
+          <label style="font-size: 0.75rem; font-weight: 600; color: #64748b;" for="filter-session">Filter by Session</label>
+          <select id="filter-session" class="form-control" style="width: 100%; margin-top: 0.25rem;" onchange="loadAllLogs()">
+            <option value="">All Sessions</option>
+          </select>
+        </div>
+        <div style="flex: 1; min-width: 180px;">
+          <label style="font-size: 0.75rem; font-weight: 600; color: #64748b;" for="filter-student">Filter by Student</label>
+          <select id="filter-student" class="form-control" style="width: 100%; margin-top: 0.25rem;" onchange="loadAllLogs()">
+            <option value="">All Students</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Email</th>
+              <th>Session</th>
+              <th>Date</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+              <th>Late Reason</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-logs-tbody">
+            <tr>
+              <td colspan="9" style="text-align: center; color: var(--text-muted);">Loading logs...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: STUDENT REGISTRATIONS -->
+    <!-- ========================================== -->
+    <section id="section-students" class="glass-panel" style="display: none;">
+      <h2>Manage Student Registrations</h2>
+      
+      <!-- Pending Students -->
+      <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #0d9488;">Pending Registrations</h3>
+      <div class="table-responsive" style="margin-bottom: 2rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Email</th>
+              <th>Assign & Approve Session</th>
+              <th>Applied Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pending-students-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading pending registrations...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Approved Students -->
+      <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #0f172a;">All Registered Students</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Current Session</th>
+              <th>Approval Status</th>
+              <th>Modify Session</th>
+              <th>Account Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-students-tbody">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted);">Loading student list...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: MANAGE SESSIONS -->
+    <!-- ========================================== -->
+    <section id="section-sessions" style="display: none;">
+      <div class="dashboard-grid dashboard-grid-main">
+        
+        <!-- Sessions List -->
+        <div class="glass-panel">
+          <h2>Active Sessions / Seasons</h2>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Session Name</th>
+                  <th>Days Scheduled</th>
+                  <th>Time Slot</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sessions-list-tbody">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading sessions...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Add Session Card -->
+        <div class="glass-panel">
+          <h2>Create New Session</h2>
+          <form id="create-session-form" onsubmit="createSession(event)">
+            <div class="form-group">
+              <label for="new-session-name">Session Name (e.g., s2, s3)</label>
+              <input type="text" id="new-session-name" class="form-control" placeholder="e.g. s3" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Select Scheduled Days</label>
+              <div class="days-checkbox-grid">
+                <label class="checkbox-label"><input type="checkbox" name="session-days" value="Monday"> Mon</label>
+                <label class="checkbox-label"><input type="checkbox" name="session-days" value="Tuesday"> Tue</label>
+                <label class="checkbox-label"><input type="checkbox" name="session-days" value="Wednesday"> Wed</label>
+                <label class="checkbox-label"><input type="checkbox" name="session-days" value="Thursday"> Thu</label>
+                <label class="checkbox-label"><input type="checkbox" name="session-days" value="Friday"> Fri</label>
+                <label class="checkbox-label"><input type="checkbox" name="session-days" value="Saturday"> Sat</label>
+                <label class="checkbox-label"><input type="checkbox" name="session-days" value="Sunday"> Sun</label>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+              <div class="form-group" style="flex: 1;">
+                <label for="new-session-time-start">Start Time</label>
+                <input type="time" id="new-session-time-start" class="form-control" value="09:00">
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label for="new-session-time-end">End Time</label>
+                <input type="time" id="new-session-time-end" class="form-control" value="17:00">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+              Create Session
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: VIEW LATE REASON -->
+  <!-- ========================================== -->
+  <div id="view-reason-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color: #b45309; display: flex; align-items: center; gap: 0.5rem;">
+          <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          Late Check-In Details
+        </h3>
+        <span class="close-btn" onclick="closeModal('view-reason-modal')">&times;</span>
+      </div>
+      <div>
+        <p style="margin-bottom: 0.5rem; font-size: 0.9rem;"><strong>Student:</strong> <span id="reason-modal-student"></span></p>
+        <p style="margin-bottom: 0.5rem; font-size: 0.9rem;"><strong>Date & Check-in:</strong> <span id="reason-modal-date-time"></span></p>
+        <div style="margin-top: 1rem;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: #64748b; text-transform: uppercase;">Submitted Reason:</label>
+          <div id="reason-modal-text" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 1rem; font-size: 0.95rem; color: #991b1b; white-space: pre-wrap; margin-top: 0.25rem;"></div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('view-reason-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: EDIT ATTENDANCE RECORD -->
+  <!-- ========================================== -->
+  <div id="edit-log-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Attendance Record</h3>
+        <span class="close-btn" onclick="closeModal('edit-log-modal')">&times;</span>
+      </div>
+      <form id="edit-log-form" onsubmit="submitEditLog(event)">
+        <input type="hidden" id="edit-log-id">
+        <div class="form-group">
+          <label>Student</label>
+          <input type="text" id="edit-log-student-name" class="form-control" readonly style="background: #f1f5f9; cursor: not-allowed;">
+        </div>
+        <div class="form-group">
+          <label for="edit-log-date">Date</label>
+          <input type="date" id="edit-log-date" class="form-control" required>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <div class="form-group" style="flex: 1;">
+            <label for="edit-log-checkin">Check In (HH:MM:SS)</label>
+            <input type="text" id="edit-log-checkin" class="form-control" placeholder="09:00:00">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="edit-log-checkout">Check Out (HH:MM:SS)</label>
+            <input type="text" id="edit-log-checkout" class="form-control" placeholder="17:00:00">
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label for="edit-log-is-late">Late Check-In?</label>
+            <select id="edit-log-is-late" class="form-control">
+              <option value="false">No (On Time)</option>
+              <option value="true">Yes (Late)</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label for="edit-log-is-auto">Auto Check-Out?</label>
+            <select id="edit-log-is-auto" class="form-control">
+              <option value="false">No (Manual)</option>
+              <option value="true">Yes (Auto)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-log-late-reason">Late Reason (if late)</label>
+          <textarea id="edit-log-late-reason" class="form-control" rows="2" placeholder="Reason for late check-in..." style="resize: vertical; font-family: inherit; width: 100%;"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-log-status">Approval Status</label>
+          <select id="edit-log-status" class="form-control">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: MANUAL ATTENDANCE LOG -->
+  <!-- ========================================== -->
+  <div id="manual-log-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Manual Attendance</h3>
+        <span class="close-btn" onclick="closeModal('manual-log-modal')">&times;</span>
+      </div>
+      <form id="manual-log-form" onsubmit="submitManualLog(event)">
+        <div class="form-group">
+          <label for="manual-log-student">Select Student</label>
+          <select id="manual-log-student" class="form-control" required>
+            <option value="" disabled selected>Choose Approved Student</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="manual-log-session">Assign Session</label>
+          <select id="manual-log-session" class="form-control" required>
+            <option value="" disabled selected>Choose Session</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="manual-log-date">Date</label>
+          <input type="date" id="manual-log-date" class="form-control" required>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <div class="form-group" style="flex: 1;">
+            <label for="manual-log-checkin">Check In Time</label>
+            <input type="time" id="manual-log-checkin" class="form-control" value="09:00">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="manual-log-checkout">Check Out Time</label>
+            <input type="time" id="manual-log-checkout" class="form-control" value="17:00">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Record Attendance
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: EDIT SESSION SCHEDULE -->
+  <!-- ========================================== -->
+  <div id="edit-schedule-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="edit-schedule-title">Edit Session Schedule</h3>
+        <span class="close-btn" onclick="closeModal('edit-schedule-modal')">&times;</span>
+      </div>
+      <form id="edit-schedule-form" onsubmit="submitEditSchedule(event)">
+        <input type="hidden" id="edit-schedule-id">
+        
+        <div class="form-group">
+          <label>Select Scheduled Days</label>
+          <div class="days-checkbox-grid">
+            <label class="checkbox-label"><input type="checkbox" name="edit-session-days" value="Monday"> Mon</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-session-days" value="Tuesday"> Tue</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-session-days" value="Wednesday"> Wed</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-session-days" value="Thursday"> Thu</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-session-days" value="Friday"> Fri</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-session-days" value="Saturday"> Sat</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-session-days" value="Sunday"> Sun</label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <div class="form-group" style="flex: 1;">
+            <label for="edit-session-time-start">Start Time</label>
+            <input type="time" id="edit-session-time-start" class="form-control">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="edit-session-time-end">End Time</label>
+            <input type="time" id="edit-session-time-end" class="form-control">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Save Schedule Settings
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      verifyUserRole('admin');
+      initAdminDashboard();
+    });
+  </script>
+</body>
+</html>
